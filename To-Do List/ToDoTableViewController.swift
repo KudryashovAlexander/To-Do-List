@@ -21,18 +21,19 @@ class ToDoTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadItems()
-
+        title = selectedCategory?.name
+        navigationController?.delegate = self
     }
 
+    //MARK: - Pressed save button
     @IBAction func addPressedButton(_ sender: UIBarButtonItem) {
         if let category = self.selectedCategory {
         let vc = storyboard?.instantiateViewController(identifier: "TaskVC") as! TaskViewController
-            vc.selectedCategory = category
+           vc.selectedCategory = category
             navigationController?.pushViewController(vc, animated: true)
+        } else {
+            print("Error let category")
         }
-        
-        
-  
     }
     
     // MARK: - Data Sourse
@@ -49,6 +50,7 @@ class ToDoTableViewController: UITableViewController {
 
     
     //MARK: - Data Sourse methods
+    //сохранение в память
     func saveItem() {
         do{
             try context.save()
@@ -57,21 +59,30 @@ class ToDoTableViewController: UITableViewController {
         }
     }
     
-    func loadItems() {
-        let request:NSFetchRequest<Item> = Item.fetchRequest()
+    //3.4 Загружаем данные из памяти Persistant Container
+    
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
+//        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        
+        if let additionalPredicate = predicate {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+        } else {
+            request.predicate = categoryPredicate
+        }
+
         do {
             itemArray = try context.fetch(request)
-        } catch  {
-            print("Error loadItems \(error)")
+        } catch {
+            print("Error request context")
         }
+        tableView.reloadData()
     }
 }
 
 //MARK:- Extension SearchBar
 extension ToDoTableViewController: UISearchBarDelegate {
-    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        //Создаем запрос в базу данных
         let request: NSFetchRequest<Item> = Item.fetchRequest()
         
         //Используем NSPredicete - как данные должны быть извечены или отфильтрованы
@@ -81,7 +92,7 @@ extension ToDoTableViewController: UISearchBarDelegate {
         request.sortDescriptors = [NSSortDescriptor(key: "text", ascending: true)]
         
         //Обновляем табличное представление
-//        loadItems(with: request, predicate: predicate)
+       loadItems(with: request, predicate: predicate)
         
     }
     
@@ -93,5 +104,12 @@ extension ToDoTableViewController: UISearchBarDelegate {
                 searchBar.resignFirstResponder()
             }
         }
+    }
+}
+//MARK: - NavigationController Delegate
+extension ToDoTableViewController: UINavigationControllerDelegate {
+    func navigationController(_: UINavigationController, didShow: UIViewController, animated: Bool){
+        loadItems()
+        tableView.reloadData()
     }
 }

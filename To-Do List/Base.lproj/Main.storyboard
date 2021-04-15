@@ -63,6 +63,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="taskNameTextField" destination="amc-Gc-CRF" id="Atb-dc-Y6X"/>
+                        <outlet property="taskNotesTextField" destination="vIg-zi-Duw" id="ybG-ey-c6t"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GnA-10-fXE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

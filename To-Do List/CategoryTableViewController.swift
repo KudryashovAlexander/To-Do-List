@@ -8,7 +8,7 @@
 import UIKit
 import CoreData
 
-class CategoryTableViewController: UITableViewController, UINavigationControllerDelegate {
+class CategoryTableViewController: UITableViewController {
     
     var categoryArray = [Category]()
 
@@ -72,31 +72,19 @@ class CategoryTableViewController: UITableViewController, UINavigationController
             print("Error save contex\(error)")
         }
     }
-    //MARK: - TableView Delegate method
+//MARK: - TableView Delegate method
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = storyboard?.instantiateViewController(identifier: "ToDoVC") as! ToDoTableViewController
         vc.selectedCategory = categoryArray[indexPath.row]
         navigationController?.pushViewController(vc, animated: true)
         
     }
-    
-    
-    
-    
-    
-    
-    //MARK: NavigationController Delegate
+}
+//MARK: - NavigationController Delegate
+extension CategoryTableViewController: UINavigationControllerDelegate {
     func navigationController(_: UINavigationController, didShow: UIViewController, animated: Bool){
         loadCategory()
         tableView.reloadData()
     }
-    
-
-
-
-
-    
-    
 }
-
     
